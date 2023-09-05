@@ -12,6 +12,7 @@ def read_data(file_name):
         document_id.append(int(line_list[0]))
         word_id.append(int(line_list[1]))
         count.append(int(line_list[2]))
+    f.close()
     return [document_id, word_id, count]
 
 def read_labels(file_name):
@@ -66,7 +67,7 @@ def organize_doc_word_count(LR_unorganized_input):
         if doc_id not in doc_word_count_dict.keys():
             doc_word_count_dict[doc_id] = [0] * (len(word_list))
         doc_word_count_dict[doc_id][word_list.index(LR_unorganized_input[1][i])] = LR_unorganized_input[2][i]
-    return [doc_word_count_dict, word_list]
+    return (doc_word_count_dict, word_list)
 
 
 def organize_doc_label(LR_unorganized_input):
@@ -78,8 +79,7 @@ def organize_doc_label(LR_unorganized_input):
 
 
 def organize_input_data(unorganized_data):
-    word_list = organize_doc_word_count(unorganized_data)[1]
-    doc_word_count_dict = organize_doc_word_count(unorganized_data)[0]
+    doc_word_count_dict,word_list = organize_doc_word_count(unorganized_data)
     doc_label_dict = organize_doc_label(unorganized_data)
     LR_input_data = []
     for doc_id in doc_word_count_dict.keys():
