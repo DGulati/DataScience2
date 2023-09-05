@@ -35,7 +35,7 @@ def Logistic_Regression_train(LR_input):
     words = LR_input[1]
     dim = len(words)+1
     #initialize the weights ( one extra for the intercept )
-    weights = np.zeros(dim, dtype=float)
+    weights = np.random.default_rng().uniform(0,1,dim)
     #initialize the step size
     step_size = 0.0001
     for row in LR_input[0]:
@@ -110,9 +110,9 @@ def Logistic_Regression_test(LR_test_input, LR_weights):
         X_weights = np.array(X_weights,dtype=float)
 
         d = np.sum(np.dot(X_weights,weights))
-        predict = sigmoid_function(d)
+        predict = d
 
-        if predict < 0.5:
+        if predict <= 0:
             LR_output[doc_id] = 0
         else:
             LR_output[doc_id] = 1
@@ -124,13 +124,13 @@ def Logistic_Regression_test(LR_test_input, LR_weights):
 
 def main():   
     
-    train_data_file_name = sys.argv[1]
-    train_label_file_name = sys.argv[2]
-    test_file_name = sys.argv[3]
+    # train_data_file_name = sys.argv[1]
+    # train_label_file_name = sys.argv[2]
+    # test_file_name = sys.argv[3]
     
-    #train_data_file_name = "./Homework1/train.data"
-    #train_label_file_name = "./Homework1/train.label"
-    #test_file_name = "./Homework1/test_partial.data"
+    train_data_file_name = "./Homework1/train.data"
+    train_label_file_name = "./Homework1/train.label"
+    test_file_name = "./Homework1/test_partial.data"
 
     train_data = read_data(train_data_file_name)
     test_data = read_data(test_file_name)
