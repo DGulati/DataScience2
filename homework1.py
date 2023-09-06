@@ -1,4 +1,5 @@
-# Description: Homework 1 for CS 6360 
+# Description: Homework 1 for CS 6360
+#Score: 0.62
 import numpy as np
 import sys
 
@@ -26,8 +27,8 @@ def read_labels(file_name):
 def sigmoid_function(x):
     z = 1/(1 + np.exp(-x))
     return z
-         
-def Logistic_Regression_train(LR_input,epochs):
+
+def Logistic_Regression_train(LR_input):
     #w_0 + \sum_{i=1}^{n} w_i * x_i
     #words are the variables
     #word count is the value of those variables
@@ -38,24 +39,23 @@ def Logistic_Regression_train(LR_input,epochs):
     weights = np.zeros(dim, dtype=float)
     #initialize the step size
     step_size = 0.0001
-    for epoch in range(epochs):
-        for row in LR_input[0]:
-            X_i = row[1]
-            Y = row[2]
+    for row in LR_input[0]:
+        X_i = row[1]
+        Y = row[2]
 
-            #gradient = x_i * [Y - sigmoid(w_0 + \sum_{i=1}^{n} w_i * x_i)]
+        #gradient = x_i * [Y - sigmoid(w_0 + \sum_{i=1}^{n} w_i * x_i)]
 
-            X_weights = [1] + X_i
-            X = np.array(X_weights,dtype=float)
+        X_weights = [1] + X_i
+        X = np.array(X_weights,dtype=float)
 
-            dot = np.dot(X_weights,weights)
+        dot = np.dot(X_weights,weights)
 
-            predict = sigmoid_function(np.sum(dot))
-            diff = Y - predict
+        predict = sigmoid_function(np.sum(dot))
+        diff = Y - predict
 
-            gradient = diff * X
-            
-            weights = np.add(weights,step_size * gradient)
+        gradient = diff * X
+        
+        weights = np.add(weights,step_size * gradient)
 
     return weights
 
@@ -70,8 +70,6 @@ def organize_doc_word_count(LR_unorganized_input):
         doc_word_count_dict[doc_id][word_list.index(LR_unorganized_input[1][i])] = LR_unorganized_input[2][i]
     return (doc_word_count_dict, word_list)
 
-
-    
 
 def organize_doc_label(LR_unorganized_label_input):
     doc_label_dict = {}
@@ -115,12 +113,14 @@ def Logistic_Regression_test(LR_test_input, LR_weights):
         d = np.sum(np.dot(X_weights,weights))
         predict = sigmoid_function(d)
 
-        if predict < 0.5:
+        if predict <= 0.5:
             LR_output[doc_id] = 0
         else:
             LR_output[doc_id] = 1
 
     return LR_output
+
+
 
 
 def main():   
@@ -140,7 +140,7 @@ def main():
     LR_input = organize_input_data(LR_data)
     LR_input_words = LR_input[1]
 
-    LR_weights = Logistic_Regression_train(LR_input,15)
+    LR_weights = Logistic_Regression_train(LR_input)
 
     LR_test = test_data
     LR_test_input = organize_test_data(LR_test,LR_input_words)
@@ -152,11 +152,10 @@ def main():
     for key in keys:
         sorted_output.append(LR_output[key])
     
-
     for i in sorted_output:
         print(i)
 
-    # print(sorted_output.count(1))
+
     #print(list(LR_output.values()).count(0))
     
 
