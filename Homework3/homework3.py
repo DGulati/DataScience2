@@ -49,44 +49,63 @@ if __name__ == "__main__":
 
     # Read in the data.
     X, y = read_data(args['infile'])
-    Data = zip(y, X)
 
-    classes = np.unique(y)
-    
-    seeds = []
-    for i in classes and i != -1:
-        i_class = Data[y == i]
-        i_class_X = i_class[:, 1:]
-
-        if t == "random":
-            indecies_chosen = np.random.choice(len(i_class), k, replace = False)
-
-        elif t == "degree":
-            #Calculate the affinity matrix
-            A = pairwise.rbf_kernel(i_class_X, gamma = gamma)
-            #Calculate the degrees
-            Sums = np.sum(A, axis = 1)
-            indecies_chosen =np.argpartition(Sums, -k, axis=1)[:, -k:]
-            
-        seeds.append(i_class_X[indecies_chosen])
-    
-    u = np.array(seeds)
+    #Add index to each data point so that we can keep track of them  
+    index = np.arange(0, len(X))
+    Data = np.column_stack((index,y,X))
 
     #Calculate the affinity matrix
     A = pairwise.rbf_kernel(X, gamma = gamma)
 
     #Calculate the degree matrix
     Sums = np.sum(A, axis = 1)
+    Sums_Data = np.column_stack((index,y,Sums))
     D = np.diag(Sums)
 
     #Calculate the weighted transition matrix
     W = np.dot(np.linalg.inv(D), A)
+    
+    #Need to calculate seed vectors for each class. 
+    classes = np.unique(y)
+    u = {}
+
+    if t == "random":
+        for i in classes and i != -1:  
+            #Get the data points that belong to the class
+            i_class = Data[Data[:, 1] == i]      
+            indecies_chosen = np.random.choice(Data[0], k, replace = False)
+            u[i] = np.zeros(len(X))
+            u[i][indecies_chosen] = 1/k
+    elif t == "degree":
+        for i in classes and i != -1:
+            #Get the sums for the points that belong to the class
+            i_Sums = Sums_Data[Sums_Data[:, 1] == i]    
+            i_Sums = i_Sums[i_Sums[:, 2].argsort()[::-1]]
+            indecies_chosen = i_Sums[0:k, 0]
+            u[i] = np.zeros(len(X))
+            u[i][indecies_chosen] = 1/k
+
+    r = u.deepcopy()
+    
+    iter = 0
+    while iter < 100:
+        iter += 1
+        r_old = r.deepcopy()
+        for i in classes and i != -1:
+            r[i] = (1-d)*u[i] + d*np.dot(W, r_old[i])
+        if np.linalg.norm(r[i] - r_old[i]) < epsilon:
+            break
+
+    if iter == 100:
+        print("Did not converge")
+
+    Data[Data[:, 1] == -1][1] = np.argmax(r, axis = 0)[Data[:, 1] == -1]
+
+    save_data(outfile, Data[:, 1])
+
+    print("Done!")
 
     
-
-
-
-
 
 
 
