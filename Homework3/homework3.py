@@ -49,5 +49,51 @@ if __name__ == "__main__":
 
     # Read in the data.
     X, y = read_data(args['infile'])
+    Data = zip(y, X)
 
-    # FINISH ME
+    classes = np.unique(y)
+    
+    seeds = []
+    for i in classes and i != -1:
+        i_class = Data[y == i]
+        i_class_X = i_class[:, 1:]
+
+        if t == "random":
+            indecies_chosen = np.random.choice(len(i_class), k, replace = False)
+
+        elif t == "degree":
+            #Calculate the affinity matrix
+            A = pairwise.rbf_kernel(i_class_X, gamma = gamma)
+            #Calculate the degrees
+            Sums = np.sum(A, axis = 1)
+            indecies_chosen =np.argpartition(Sums, -k, axis=1)[:, -k:]
+            
+        seeds.append(i_class_X[indecies_chosen])
+    
+    u = np.array(seeds)
+
+    #Calculate the affinity matrix
+    A = pairwise.rbf_kernel(X, gamma = gamma)
+
+    #Calculate the degree matrix
+    Sums = np.sum(A, axis = 1)
+    D = np.diag(Sums)
+
+    #Calculate the weighted transition matrix
+    W = np.dot(np.linalg.inv(D), A)
+
+    
+
+
+
+
+
+
+
+    
+
+
+
+    
+
+
