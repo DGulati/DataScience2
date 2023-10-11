@@ -66,7 +66,7 @@ if __name__ == "__main__":
     W = np.dot(np.linalg.inv(D), A)
     
     #Need to calculate seed vectors for each class. 
-    classes = np.unique(y)
+    classes = list(np.unique(y))
     u = {}
 
     if t == "random":
